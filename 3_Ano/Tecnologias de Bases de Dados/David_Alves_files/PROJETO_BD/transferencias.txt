@@ -1,0 +1,2 @@
+create view transferencias as select nome_jogador,clube_antigo,clube_novo,valor_transferencia from transferencia;
+select * from transferencias;

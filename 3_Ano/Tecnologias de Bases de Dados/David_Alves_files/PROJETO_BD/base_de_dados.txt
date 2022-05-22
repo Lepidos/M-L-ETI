@@ -1,0 +1,794 @@
+drop database if exists projeto;
+create database projeto;
+use projeto;
+
+create table pais(
+id_pais int not null auto_increment,
+nome_pais varchar(100),
+
+primary key(id_pais)
+
+);
+
+create table liga(
+id_liga int not null auto_increment,
+id_pais int,
+divisao int,
+nome_liga varchar(100),
+
+primary key (id_liga),
+foreign key (id_pais) references pais(id_pais)
+);
+ALTER TABLE liga ADD pais varchar(100)  AFTER id_pais;
+
+create table treinador(
+id_treinador int  not null auto_increment,
+id_pais int,
+nome_treinador varchar(100),
+
+primary key (id_treinador),
+foreign key (id_pais) references pais(id_pais)
+);
+ALTER TABLE treinador ADD nacionalidade varchar(100)  AFTER id_pais;
+ALTER TABLE treinador ADD clube varchar(100)  AFTER nome_treinador;
+
+create table clube(
+id_clube int  not null auto_increment,
+id_liga int,
+nome_clube varchar(100),
+id_treinador int,
+
+primary key (id_clube),
+foreign key (id_liga) references liga(id_liga),
+foreign key (id_treinador) references treinador(id_treinador)
+);
+ALTER TABLE clube ADD nome_treinador varchar(100)  AFTER id_treinador;
+ALTER TABLE clube ADD liga varchar(100)  AFTER id_liga;
+ALTER TABLE clube ADD pais varchar(100)  AFTER liga;
+
+
+create table jogador(
+id_jogador int  not null auto_increment,
+id_clube int,
+id_pais int,
+idade_jogador int,
+nome_jogador varchar(100),
+rating int,
+posicao varchar(4),
+valor_de_mercado decimal (8,3),
+
+salario_jogador decimal (8,3),
+
+primary key (id_jogador),
+foreign key(id_clube) references clube(id_clube),
+foreign key(id_pais) references pais(id_pais)
+);
+
+ALTER TABLE jogador ADD  nome_clube varchar(100)  AFTER id_clube;
+ALTER TABLE jogador ADD  nacionalidade varchar(100)  AFTER id_pais;
+
+create table treinamento(
+id_treinamento int not null auto_increment,
+id_treinador int,
+id_clube int,
+data_inicio varchar(100),
+data_fim varchar(100),
+
+primary key (id_treinamento),
+foreign key(id_treinador) references treinador(id_treinador),
+foreign key(id_clube) references clube(id_clube)
+);
+ALTER TABLE treinamento  ADD clube varchar(100)  AFTER id_clube;
+ALTER TABLE treinamento  ADD nome_treinador varchar(100)  AFTER id_treinador;
+
+create table transferencia(
+id_transferencia int not null auto_increment,
+id_jogador int,
+id_clube_antigo int,
+id_clube_novo int,
+valor_transferencia decimal (8,3),
+
+primary key (id_transferencia),
+foreign key(id_jogador) references jogador(id_jogador),
+foreign key(id_clube_antigo) references clube(id_clube),
+foreign key(id_clube_novo) references clube(id_clube)
+);
+ALTER TABLE transferencia ADD nome_jogador varchar(100)  AFTER id_jogador;
+ALTER TABLE transferencia ADD clube_antigo varchar(100)  AFTER id_clube_antigo;
+ALTER TABLE transferencia ADD clube_novo varchar(100)  AFTER id_clube_novo;
+
+create table jogo(
+id_jogo int not null auto_increment,
+id_clube_local int,
+id_clube_visitante int,
+golos_local int,
+golos_visitante int,
+
+primary key (id_jogo),
+foreign key(id_clube_local) references clube(id_clube),
+foreign key(id_clube_visitante) references clube(id_clube)
+);
+ALTER TABLE jogo ADD clube_local varchar(100)  AFTER id_clube_local;
+ALTER TABLE jogo ADD clube_visitante varchar(100)  AFTER id_clube_visitante;
+
+create table classificacao_semanal(
+id_classificacao int not null auto_increment,
+id_liga int ,
+id_clube int,
+numero_golos int,
+pontos  int,
+
+primary key (id_classificacao),
+foreign key(id_liga) references liga(id_liga),
+foreign key(id_clube) references clube(id_clube)
+);
+ALTER TABLE classificacao_semanal  ADD nome_clube varchar(100)  AFTER id_clube;
+ALTER TABLE classificacao_semanal  ADD jogos int  AFTER pontos;
+
+
+
+delimiter //
+create  procedure nova_transferencia (in id int, novo_clube int,valt decimal (8,3) )
+begin
+declare  id__clube int;
+declare nomej varchar(100);
+declare nomecla varchar(100);
+declare nomecln varchar(100);
+declare nc varchar(100);
+
+select id_clube
+into id__clube
+from jogador
+where id_jogador=id;
+
+select nome_clube
+into nc
+from clube
+where id_clube=novo_clube;
+
+update jogador
+set   id_clube = novo_clube,
+        nome_clube=nc
+where id_jogador = id;
+
+select nome_jogador
+into nomej
+from jogador
+where id_jogador=id;
+
+select nome_clube
+into nomecla
+from clube
+where id_clube=id__clube;
+
+select nome_clube
+into nomecln
+from clube
+where id_clube=novo_clube;
+
+
+insert into transferencia(id_jogador,nome_jogador,id_clube_antigo,clube_antigo,id_clube_novo,clube_novo,valor_transferencia)
+values (id,nomej,id__clube,nomecla,novo_clube,nomecln,valt);
+
+update jogador
+set valor_de_mercado = valt
+where id_jogador=id;
+
+end//
+delimiter ;
+
+delimiter //
+create procedure inserir_jogador (in idc int, idp int, idad int, nom varchar(100), rat int,pos varchar(4), vm decimal (8,3), sal decimal (8,3))
+begin
+declare clube varchar(100);
+declare nac varchar(100);
+
+select nome_clube
+into clube
+from clube
+where id_clube=idc;
+
+select nome_pais
+into nac
+from pais
+where id_pais=idp;
+
+insert into jogador(id_clube,nome_clube,id_pais,nacionalidade, idade_jogador,nome_jogador,rating,posicao,valor_de_mercado,salario_jogador)
+values (idc,clube,idp,nac,idad,nom,rat,pos,vm,sal);
+
+end//
+delimiter ;
+
+delimiter //
+create procedure inserir_treinador (in idp int, nom varchar(100))
+begin
+declare nomep varchar(100);
+
+select nome_pais
+into nomep
+from pais
+where id_pais=idp;
+
+insert into treinador(id_pais,nacionalidade,nome_treinador)
+values (idp,nomep,nom);
+
+end//
+delimiter ;
+
+delimiter //
+
+create trigger inserir_treinamento
+after insert on treinador    
+for each row
+begin 
+declare nt varchar(100);
+
+select nome_treinador
+into nt
+from treinador
+where id_treinador=NEW.id_treinador;
+
+insert into treinamento(id_treinador,nome_treinador,id_clube,clube,data_inicio,data_fim)
+values(NEW.id_treinador,nt,NULL,NULL,NULL,NULL);
+
+end//
+delimiter ;
+
+delimiter //
+create procedure inserir_pais (in nom varchar(100))
+begin 
+
+insert into pais(nome_pais)
+values (nom);
+
+end//
+delimiter ;
+
+
+
+delimiter //
+create procedure inserir_liga (in idp int,dv int, nom varchar(100))
+begin
+declare np varchar(100);
+select nome_pais
+into np
+from pais
+where id_pais=idp;
+
+insert into liga(id_pais,pais,divisao,nome_liga)
+values (idp,np,dv,nom);
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure inserir_clube (in idl int, nom varchar(100), idt int)
+begin
+declare nt varchar(100);
+declare nl varchar(100);
+declare idp int;
+declare np varchar(100);
+
+select nome_liga
+into nl
+from liga
+where id_liga=idl;
+
+select nome_treinador
+into nt
+from treinador
+where id_treinador=idt;
+
+select id_pais
+into idp
+from liga
+where id_liga=idl;
+
+select nome_pais
+into np
+from pais
+where id_pais=idp;
+
+insert into clube(id_liga,liga,pais,nome_clube, id_treinador,nome_treinador)
+values (idl,nl,np,nom,idt,nt);
+
+end//
+delimiter ;
+
+
+
+
+
+
+delimiter //
+create procedure apagar_clube (in idc int)
+begin
+
+delete from clube where id_clube=idc;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure apagar_treinador (in idt int)
+begin
+
+delete from treinador where id_treinador=idt;
+
+end//
+delimiter ;
+
+
+
+delimiter //
+create procedure apagar_liga (in idl int)
+begin
+
+delete from liga where id_liga=idl;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure apagar_pais (in idp int)
+begin
+
+delete from pais where id_pais=idp;
+
+end//
+delimiter ;
+
+
+
+
+delimiter //
+create procedure apagar_jogador (in idj int)
+begin
+
+delete from jogador where id_jogador=idj;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure editar_pais (in idp int, nom varchar(100))
+begin
+update pais
+set nome_pais = nom  where id_pais=idp;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure editar_liga (in idl int,idp int,dv int, nom varchar(100))
+begin
+declare p varchar(100);
+select nome_pais
+into p
+from pais
+where id_pais=idp;
+
+update liga
+set nome_liga = nom,
+     id_pais=idp,
+     pais=p,
+     divisao=dv  
+where id_liga=idl;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure editar_treinador (in idt int,idp int, nom varchar(100))
+begin
+declare np varchar(100);
+select nome_pais
+into np
+from pais
+where id_pais=idp;
+
+update treinador
+set nome_treinador = nom,
+      id_pais=idp,
+      nacionalidade=np
+where id_treinador=idt;
+
+end//
+delimiter ;
+
+
+
+delimiter //
+create procedure editar_clube (in idc int,idl int, nom varchar(100),idt int)
+begin
+declare l varchar(100);
+declare t varchar(100);
+declare idp int;
+declare np varchar(100);
+
+select nome_liga
+into l
+from liga
+where id_liga=idl;
+
+select nome_treinador
+into t
+from treinador
+where id_treinador=idt;
+
+select id_pais
+into idp
+from liga
+where id_liga=idl;
+
+select nome_pais
+into np
+from pais
+where id_pais=idp;
+
+update clube
+set nome_clube = nom,
+      id_liga=idl,
+      id_treinador=idt,
+      liga=l,
+      pais=np,
+      nome_treinador=t
+where id_clube=idc;
+
+end//
+delimiter ;
+
+
+
+delimiter //
+create procedure editar_jogador (in idj int,idc int, nom varchar(100),idp int, idad int,rat int, pos varchar(4), vm decimal (8,3), sal decimal (8,3))
+begin
+update jogador 
+set nome_jogador = nom,
+      id_pais=idp,
+      id_clube=idc,
+      idade_jogador=idad,
+      rating=rat,
+      posicao=pos,
+     valor_de_mercado=vm,
+     salario_jogador=sal
+where id_jogador=idj;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure despedir_treinador (in idc int)
+begin 
+declare id int;
+declare nc varchar(100);
+declare nt varchar(100);
+
+select id_treinador
+into id
+from clube
+where id_clube=idc;
+
+select nome_clube
+into nc
+from clube
+where id_clube=idc;
+
+select nome_treinador
+into nt
+from treinador
+where id_treinador=id;
+
+
+
+update treinamento 
+set  data_fim= NOW()
+where id_treinador=id and id_clube=idc;
+
+
+
+insert into treinamento(id_treinador,nome_treinador,id_clube,clube,data_inicio,data_fim)
+values(id,nt,NULL,NULL,NULL,NULL);
+
+update clube
+set id_treinador=NULL,
+      nome_treinador=NULL
+where id_clube=idc;
+
+end//
+delimiter ;
+
+
+delimiter //
+create procedure contratar_treinador (in idc int,idt int)
+begin 
+
+declare nc varchar(100);
+declare nt varchar(100);
+declare idtr int;
+
+
+select nome_clube
+into nc
+from clube
+where id_clube=idc;
+
+select nome_treinador
+into nt
+from treinador
+where id_treinador=idt;
+
+
+
+update clube
+set id_treinador=idt,
+       nome_treinador=nt
+where id_clube=idc;
+
+
+update treinamento 
+set  data_inicio= NOW(),
+       nome_treinador=nt,
+       clube=nc,
+       id_clube=idc
+where id_treinador=idt and data_fim is NULL;
+
+end//
+delimiter ;
+
+delimiter //
+create procedure novo_jogo (in idcl int,idcv int, gol int, gov int)
+begin
+declare idliga_l int;
+declare idliga_v int;
+declare clubelocal varchar(100);
+declare clubevisi varchar(100);
+
+select id_liga
+into idliga_l
+from clube
+where id_clube=idcl;
+
+select id_liga
+into idliga_v
+from clube
+where id_clube=idcv;
+
+select nome_clube
+into clubelocal
+from clube
+where id_clube=idcl;
+
+select nome_clube
+into clubevisi
+from clube
+where id_clube=idcv;
+
+
+insert into jogo(id_clube_local,clube_local,id_clube_visitante,clube_visitante,golos_local,golos_visitante)
+values(idcl,clubelocal,idcv,clubevisi,gol,gov);    
+
+if  exists (select id_clube from classificacao_semanal where id_clube=idcl) then
+
+if(gol> gov) then
+update classificacao_semanal
+set pontos=pontos+3,
+      jogos=jogos+1,
+      numero_golos=numero_golos+gol
+where id_clube=idcl;
+
+
+if(gov> gol) then
+update classificacao_semanal
+set  pontos=pontos+0,
+       jogos=jogos+1,
+       numero_golos=numero_golos+gol
+where id_clube=idcl;
+
+if(gov=gol) then
+update classificacao_semanal
+set  pontos=pontos+1,
+       jogos=jogos+1,
+       numero_golos= numero_golos+gol
+where id_clube=idcl;
+
+end if;
+end if;
+end if;
+
+
+else
+if(gol> gov) then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_l,idcl,clubelocal,gol,3,1);  
+if(gov>gol)  then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_l,idcl,clubelocal,gol,0,1);  
+if(gov=gol) then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_l,idcl,clubelocal,gol,1,1);  
+end if;
+end if;
+end if;
+
+end if;
+
+
+if  exists (select id_clube from classificacao_semanal where id_clube=idcv) then
+
+if(gol> gov) then
+update classificacao_semanal
+set pontos=pontos+0,
+      jogos=jogos+1,
+      numero_golos=numero_golos+gov
+where id_clube=idcv;
+
+
+if(gov> gol) then
+update classificacao_semanal
+set  pontos=pontos+3,
+       jogos=jogos+1,
+       numero_golos=numero_golos+gov
+where id_clube=idcv;
+
+if(gov=gol) then
+update classificacao_semanal
+set numero_golos=numero_golos+gov,
+      jogos=jogos+1,
+      pontos=pontos+1
+where id_clube=idcv;
+
+end if;
+end if;
+end if;
+
+else
+if(gol> gov) then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_v,idcv,clubevisi,gov,0,1);  
+
+if(gov> gol) then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_v,idcv,clubevisi,gov,3,1);  
+
+if(gol= gov) then
+insert into classificacao_semanal(id_liga,id_clube,nome_clube,numero_golos, pontos,jogos)
+values(idliga_v,idcv,clubevisi,gov,1,1);  
+
+end if;
+end if;
+end if;
+
+end if;
+
+end//
+delimiter ;
+
+
+delimiter //
+create trigger verifica_transferencia
+after insert on transferencia   
+for each row 
+begin 
+declare idliga_a int;
+declare idliga_n int;
+declare idclube int;
+declare nvalor decimal (8,3);
+
+
+
+
+
+select id_liga
+into idliga_a
+from clube
+where id_clube=NEW.id_clube_antigo;
+
+select id_liga
+into idliga_n
+from clube
+where id_clube=NEW.id_clube_novo;
+
+if(idliga_a=idliga_n) then
+update jogador
+set   id_clube = NEW.id_clube_novo
+where id_jogador = NEW.id_jogador;
+
+else
+select id_clube_antigo
+into idclube
+from transferencia
+where id_jogador=NEW.id_jogador;
+
+
+update jogador
+set   id_clube = idclube
+where id_jogador = NEW.id_jogador;
+
+delete from transferencia where id_transferencia=NEW.id_transferencia;
+end if;
+
+
+
+end//
+delimiter ;
+
+delimiter //
+create procedure plantel (in id int)
+begin
+select nome_jogador,nacionalidade,rating,posicao,valor_de_mercado,salario_jogador from jogador where id_clube=id;
+end//
+delimiter ;
+
+delimiter //
+create procedure procurar_jogador_nome (in nom varchar(100))
+begin
+select nome_jogador,rating,posicao,valor_de_mercado,salario_jogador from jogador where nome_jogador=nom;
+end//
+delimiter ;
+
+delimiter //
+create procedure classificacao_liga (in id int)
+begin
+select nome_clube,numero_golos,pontos,jogos from classificacao_semanal where id_liga=id order by pontos desc ;
+end//
+delimiter ;
+
+
+delimiter //
+create procedure ligas_pais (in id int)
+begin 
+select nome_liga,divisao from liga where id_pais=id ;
+end//
+delimiter ;
+
+
+
+delimiter //
+create procedure historial_treinador (in id int)
+begin 
+select clube,data_inicio,data_fim from treinamento where id_treinador=id ;
+end//
+delimiter ;
+
+
+
+
+
+
+
+delimiter @
+create function nome_clube (id int)
+returns varchar(100)
+begin
+declare  nome varchar(100);
+
+select nome_clube
+into nome
+from clube
+where id_clube=id;
+if ( id>0 ) then
+return (nome);
+else 
+return(false);
+end if;
+
+end @
+delimiter ;
+
+
+ALTER TABLE pais AUTO_INCREMENT=0;
+ALTER TABLE liga AUTO_INCREMENT=0;
+ALTER TABLE clube AUTO_INCREMENT=0;
+ALTER TABLE treinador AUTO_INCREMENT=0;
+ALTER TABLE jogador AUTO_INCREMENT=0;
+ALTER TABLE treinamento AUTO_INCREMENT=0;
+ALTER TABLE jogo AUTO_INCREMENT=0;
+

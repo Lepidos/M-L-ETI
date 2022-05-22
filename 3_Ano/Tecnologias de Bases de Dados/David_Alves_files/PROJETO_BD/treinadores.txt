@@ -1,0 +1,2 @@
+create view treinadores as select nome_treinador,nacionalidade from treinador;
+select * from treinadores;

@@ -1,0 +1,2 @@
+create view clubes as select liga,pais,nome_clube,nome_treinador from clube;
+select * from clubes;

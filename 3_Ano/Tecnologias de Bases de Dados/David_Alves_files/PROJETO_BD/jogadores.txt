@@ -1,0 +1,2 @@
+create view jogadores as select nome_jogador,nacionalidade,idade_jogador,rating,valor_de_mercado,salario_jogador,nome_clube from jogador order by valor_de_mercado ;
+select * from jogadores;

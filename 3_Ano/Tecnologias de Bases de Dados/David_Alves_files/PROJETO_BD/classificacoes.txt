@@ -1,0 +1,2 @@
+create view classificacoes as select id_liga,id_clube,numero_golos,pontos from classificacao_semanal order by pontos desc;
+select * from classificacoes;

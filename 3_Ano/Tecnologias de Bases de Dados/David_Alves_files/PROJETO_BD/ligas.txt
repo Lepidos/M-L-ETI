@@ -1,0 +1,2 @@
+create view ligas as select pais,nome_liga,divisao from liga ;
+select * from ligas;

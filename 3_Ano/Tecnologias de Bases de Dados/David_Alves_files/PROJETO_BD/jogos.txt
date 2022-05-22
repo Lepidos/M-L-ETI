@@ -1,0 +1,2 @@
+create view jogos as select clube_local,golos_local,clube_visitante,golos_visitante from jogo;
+select * from jogos;

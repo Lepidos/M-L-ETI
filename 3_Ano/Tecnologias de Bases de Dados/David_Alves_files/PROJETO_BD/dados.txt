@@ -1,0 +1,58 @@
+call inserir_pais("Portugal"); 
+call inserir_pais("Espanha");
+call inserir_pais("Franca");
+call inserir_pais("Italia");
+call inserir_pais("Inglaterra");
+call inserir_pais("Alemanha");
+call inserir_pais("Belgica");
+
+
+
+
+call inserir_liga(1,1,"Liga Portugesa"); 
+call inserir_liga(1,2,"II Liga");
+call inserir_liga(2,1,"La Liga");
+call inserir_liga(3,1,"Ligue 1");
+call inserir_liga(4,1,"Serie A");
+call inserir_liga(5,1,"Premier League");
+call inserir_liga(6,1,"Liga Alema ");
+call inserir_liga(7,1,"Liga Belga");
+
+
+call inserir_treinador(1,"Jose Mourinho"); 
+call inserir_treinador(2,"Pep Guardiola");
+call inserir_treinador(4,"Massimiliano Allegri");
+
+
+call inserir_clube(1,"Maritimo",NULL); 
+call inserir_clube(1,"Rio Ave",NULL);
+call inserir_clube(1,"Belenenses",NULL);
+call inserir_clube(1,"V.Setubal",NULL);
+call inserir_clube(2,"Santa Clara",NULL);
+call inserir_clube(2,"U.Madeira",NULL);
+call inserir_clube(2,"A.Viseu",NULL);
+call inserir_clube(3,"Barcelona",NULL);
+call inserir_clube(3,"A.Madrid",NULL);
+call inserir_clube(3,"R.Madrid",NULL);
+call inserir_clube(3,"Valencia",NULL);
+call inserir_clube(4,"PSG",NULL);
+call inserir_clube(4,"Monaco",NULL);
+call inserir_clube(4,"Lyon",NULL);
+call inserir_clube(5,"Juventus",NULL);
+call inserir_clube(5,"AC Milan",NULL);
+call inserir_clube(5,"Inter Milao",NULL);
+call inserir_clube(6,"Bayern",NULL);
+call inserir_clube(6,"Dortmund",NULL);
+call inserir_clube(7,"Standard Liege",NULL);
+call inserir_clube(7,"Anderlecht",NULL);
+call inserir_clube(7,"Charleroi",NULL);
+
+
+
+call inserir_jogador(1,1,21,"Andre Teles",73,"MC", 0.210, 0.003); 
+call inserir_jogador(1,1,23,"Cristiano Gomes",73,"DD", 0.210, 0.003);
+call inserir_jogador(1,1,24,"Filipe Oliveira",78,"MC", 1.2,0.008);
+call inserir_jogador(2,1,22,"Nelson Monte",83,"DC", 2.2, 0.012);
+call inserir_jogador(2,1,29,"Pedro Moreira",82,"MC",1.3, 0.012);
+call inserir_jogador(8,2,29,"Sergio Busquets",95,"MC", 44, 0.189);
+call inserir_jogador(8,2,26,"Sergi Roberto",91,"DD", 20, 0.084);

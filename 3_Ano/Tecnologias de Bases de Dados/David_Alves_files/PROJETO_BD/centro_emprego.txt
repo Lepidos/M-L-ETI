@@ -1,0 +1,2 @@
+create view centro_emprego as select nome_treinador,clube,data_inicio,data_fim from treinamento;
+select * from centro_emprego;
