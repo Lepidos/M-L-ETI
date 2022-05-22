@@ -26,6 +26,9 @@ https://www.dropbox.com/sh/y53n5fkpkzbirep/AAA9bqkJAlFveoDlYLFzEFDaa/MIEEICbacku
 **Repositório do MIEI:**  
 https://drive.google.com/drive/folders/1tBpWJmF0gvXJuGDTxpHNRdjJGYIjbHZZ
 
+**Repositório de LCC:**                                                                                                 
+https://github.com/NECC/Material-Do-Curso
+
 **Repositório de material extra do MIETI/LETI**                    
 https://github.com/hugo-cmac/MIETI
 
